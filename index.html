@@ -10,32 +10,35 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #fcfcfd;
+            background: linear-gradient(to bottom right, #001540, #1a2a5c);
         }
-        
-        /* Custom colors from the user's scheme */
+
+        /* Base colors */
         .bg-dark-blue { background-color: #001540; }
         .text-dark-blue { color: #001540; }
         .text-yellow-gold { color: #ffde59; }
         .border-yellow-gold { border-color: #ffde59; }
         
-        /* Quiz container should be above the background layers */
-        #quiz-container {
-            z-index: 2;
+        /* Custom shadows and glow for a modern feel */
+        .shadow-custom { 
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2); 
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
-        .shadow-custom { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.2); }
-        
-        /* Card styling for question screens */
+        .shadow-glow { box-shadow: 0 0 15px rgba(255, 222, 89, 0.6); }
+
+        /* General card styling with smooth transitions */
         .card {
             cursor: pointer;
             transition: all 0.3s ease-in-out;
             background-color: #001540;
             color: #fcfcfd;
-            border: 2px solid transparent; /* Added a transparent border */
+            border: 2px solid transparent;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s ease forwards;
         }
         .card:hover {
-            transform: scale(1.03); /* Subtle scale on hover */
+            transform: translateY(-5px) scale(1.03);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
             border-color: #ffde59;
             background-color: #001a4e;
@@ -43,135 +46,174 @@
 
         /* Active card state */
         .card.active {
-            transform: scale(1.05); /* Slightly larger scale for active */
+            transform: scale(1.05);
             background-color: #001a4e;
             border-color: #ffde59;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 15px #ffde59; /* Add a subtle glow */
-        }
-        
-        /* Hover effect for event list items on the results page */
-        #event-list li {
-            transition: all 0.3s ease-in-out;
-            border: 2px solid transparent; /* Start with a transparent border */
-            cursor: pointer;
-        }
-        #event-list li:hover {
-            transform: scale(1.03); /* Scale on hover */
-            border-color: #ffde59; /* Add the yellow border on hover */
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5);
-        }
-        /* Active state for event list items */
-        #event-list li:active {
-            transform: scale(1.05);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 15px #ffde59;
         }
-
-        /* Button styling */
+        
+        /* Button styling with gradient and hover effect */
         .btn {
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-            background-color: #ffde59; /* Set default background */
-            color: #001540; /* Set default text color */
+            background-color: #ffde59;
+            color: #001540;
             cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, color 0.3s ease;
         }
         .btn:hover {
-            transform: scale(1.03);
+            transform: translateY(-2px) scale(1.03);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-            background-color: #e6c547; /* Slightly darker yellow on hover */
+            background-color: #e6c547;
         }
-        /* Active state for buttons */
         .btn:active {
-            transform: scale(1.05);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            transform: translateY(1px) scale(1.01);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animations for screen transitions */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #quiz-container {
+            transition: all 0.5s ease-in-out;
+        }
+
+        .fade-in-screen {
+            animation: fadeInScreen 0.7s ease-in-out forwards;
+        }
+        @keyframes fadeInScreen {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .fade-out-screen {
+            animation: fadeOutScreen 0.7s ease-in-out forwards;
+        }
+        @keyframes fadeOutScreen {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.95); }
+        }
+
+        .back-btn {
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+        .back-btn:hover {
+            transform: translateX(-5px) scale(1.1);
+        }
+        
+        .loading-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            height: 200px;
         }
     </style>
 </head>
-<body class="bg-[#fcfcfd] flex items-center justify-center min-h-screen p-6">
+<body class="flex items-center justify-center min-h-screen p-4 sm:p-6">
 
-    <div class="w-full max-w-4xl mx-auto p-12 rounded-3xl bg-[#001540] shadow-custom border border-[#2a2a2a]">
+    <div class="w-full max-w-4xl mx-auto p-6 sm:p-12 rounded-3xl bg-[#001540] shadow-custom">
 
         <!-- Quiz Container -->
         <div id="quiz-container">
             <!-- Intro Section -->
-            <div id="intro-screen" class="text-center">
-                <h1 class="text-5xl sm:text-6xl font-bold text-yellow-gold mb-4 leading-tight">FBLA Event Quiz</h1>
-                <p class="mt-2 text-xl text-[#fcfcfd] mb-12">Find your perfect competitive event.</p>
-                <button id="start-quiz-btn" class="btn font-bold text-xl px-12 py-5 rounded-full shadow-lg">Start Quiz</button>
+            <div id="intro-screen" class="text-center fade-in-screen">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-yellow-gold mb-4 leading-tight">FBLA Event Quiz</h1>
+                <p class="mt-2 text-base sm:text-lg text-[#fcfcfd] mb-12">Find your perfect competitive event.</p>
+                <button id="start-quiz-btn" class="btn font-bold text-lg sm:text-xl px-8 sm:px-12 py-4 sm:py-5 rounded-full shadow-lg">Start Quiz</button>
             </div>
 
             <!-- Question 1: Competition Type -->
             <div id="question-1-screen" class="hidden">
-                <div class="flex items-center mb-8">
-                    <button class="back-btn text-gray-400 hover:text-yellow-gold transition-colors p-2">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="flex items-center mb-6 sm:mb-8">
+                    <button id="back-q1" class="back-btn text-gray-400 hover:text-yellow-gold p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                     </button>
-                    <h2 class="text-3xl font-bold text-[#fcfcfd] flex-grow text-center">What kind of competition do you prefer?</h2>
-                    <div class="w-6"></div> <!-- Spacer to align with back button -->
+                    <h2 class="text-2xl sm:text-3xl font-bold text-[#fcfcfd] flex-grow text-center">What kind of competition do you prefer?</h2>
+                    <div class="w-6"></div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div data-type="Objective Test" class="card p-8 rounded-2xl border border-[#333]">
-                        <h3 class="text-2xl font-semibold text-yellow-gold mb-2">Objective Test</h3>
-                        <p class="text-base text-[#fcfcfd]">Perfect for studying facts and showing off your knowledge.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <div data-type="Objective Test" class="card p-6 sm:p-8 rounded-2xl border border-[#333]" style="animation-delay: 0.1s;">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-yellow-gold mb-2">Objective Test</h3>
+                        <p class="text-sm sm:text-base text-[#fcfcfd]">Studying facts and showing off your knowledge.</p>
                     </div>
-                    <div data-type="Presentation" class="card p-8 rounded-2xl border border-[#333]">
-                        <h3 class="text-2xl font-semibold text-yellow-gold mb-2">Presentation</h3>
-                        <p class="text-base text-[#fcfcfd]">Great for public speakers who love to prepare and deliver their ideas.</p>
+                    <div data-type="Presentation" class="card p-6 sm:p-8 rounded-2xl border border-[#333]" style="animation-delay: 0.2s;">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-yellow-gold mb-2">Presentation</h3>
+                        <p class="text-sm sm:text-base text-[#fcfcfd]">Public speaking, preparing and delivering your ideas.</p>
                     </div>
-                    <div data-type="Production" class="card p-8 rounded-2xl border border-[#333]">
-                        <h3 class="text-2xl font-semibold text-yellow-gold mb-2">Production</h3>
-                        <p class="text-base text-[#fcfcfd]">Ideal for creative people who enjoy building tangible projects like a video or website.</p>
+                    <div data-type="Production" class="card p-6 sm:p-8 rounded-2xl border border-[#333]" style="animation-delay: 0.3s;">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-yellow-gold mb-2">Production</h3>
+                        <p class="text-sm sm:text-base text-[#fcfcfd]">Building tangible projects like a video or website.</p>
                     </div>
-                    <div data-type="Roleplay" class="card p-8 rounded-2xl border border-[#333]">
-                        <h3 class="text-2xl font-semibold text-yellow-gold mb-2">Roleplay</h3>
-                        <p class="text-base text-[#fcfcfd]">Perfect for those who are quick on their feet and thrive under pressure.</p>
+                    <div data-type="Roleplay" class="card p-6 sm:p-8 rounded-2xl border border-[#333]" style="animation-delay: 0.4s;">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-yellow-gold mb-2">Roleplay</h3>
+                        <p class="text-sm sm:text-base text-[#fcfcfd]">Quick thinking and thriving under pressure in a scenario.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Question 2: Team Size -->
             <div id="question-2-screen" class="hidden">
-                <div class="flex items-center mb-8">
-                    <button class="back-btn text-gray-400 hover:text-yellow-gold transition-colors p-2">
+                <div class="flex items-center mb-6 sm:mb-8">
+                    <button id="back-q2" class="back-btn text-gray-400 hover:text-yellow-gold p-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                     </button>
-                    <h2 class="text-3xl font-bold text-[#fcfcfd] flex-grow text-center">Do you prefer to compete solo or as a team?</h2>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-[#fcfcfd] flex-grow text-center">Solo or team?</h2>
                     <div class="w-6"></div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div data-team="Solo" class="card p-8 rounded-2xl border border-[#333] text-center">
-                        <h3 class="text-2xl font-semibold text-yellow-gold mb-2">Solo</h3>
-                        <p class="text-base text-[#fcfcfd]">Compete by yourself. This is ideal if you prefer to have full control of your project.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <div data-team="Solo" class="card p-6 sm:p-8 rounded-2xl border border-[#333] text-center" style="animation-delay: 0.1s;">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-yellow-gold mb-2">Solo</h3>
+                        <p class="text-sm sm:text-base text-[#fcfcfd]">Compete by yourself. Ideal if you prefer full control.</p>
                     </div>
-                    <div data-team="Team" class="card p-8 rounded-2xl border border-[#333] text-center">
-                        <h3 class="text-2xl font-semibold text-yellow-gold mb-2">Team</h3>
-                        <p class="text-base text-[#fcfcfd]">Work with others, usually in teams of 2 or 3. Many team events also allow for a solo competitor!</p>
+                    <div data-team="Team" class="card p-6 sm:p-8 rounded-2xl border border-[#333] text-center" style="animation-delay: 0.2s;">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-yellow-gold mb-2">Team</h3>
+                        <p class="text-sm sm:text-base text-[#fcfcfd]">Work with others in teams of 2 or 3.</p>
                     </div>
                 </div>
             </div>
 
             <!-- Question 3: Career Cluster -->
             <div id="question-3-screen" class="hidden">
-                <div class="flex items-center mb-8">
-                    <button class="back-btn text-gray-400 hover:text-yellow-gold transition-colors p-2">
+                <div class="flex items-center mb-6 sm:mb-8">
+                    <button id="back-q3" class="back-btn text-gray-400 hover:text-yellow-gold p-2">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                         </svg>
                     </button>
-                    <h2 class="text-3xl font-bold text-[#fcfcfd] flex-grow text-center">What career cluster are you interested in?</h2>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-[#fcfcfd] flex-grow text-center">What career cluster are you interested in?</h2>
                     <div class="w-6"></div>
                 </div>
-                <div id="cluster-cards-container" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div id="cluster-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                     <!-- Dynamic career cluster cards will be inserted here -->
                 </div>
             </div>
             
+            <!-- Loading Screen -->
+            <div id="loading-screen" class="loading-screen hidden">
+                <svg class="animate-spin text-yellow-gold h-16 w-16 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="text-xl text-[#fcfcfd]">Finding the perfect events...</p>
+            </div>
+
             <!-- Results Screen -->
             <div id="results-screen" class="hidden">
-                <h2 class="text-4xl font-bold text-[#fcfcfd] mb-4 text-center">Your Event Suggestions</h2>
-                <p class="text-lg text-[#fcfcfd] text-center mb-8">Based on your choices, these events could be a great fit for you!</p>
+                <div class="flex items-center mb-6 sm:mb-8">
+                    <button id="back-results" class="back-btn text-gray-400 hover:text-yellow-gold p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </button>
+                    <h2 class="text-3xl sm:text-4xl font-bold text-[#fcfcfd] flex-grow text-center">Your Event Suggestions</h2>
+                    <div class="w-6"></div>
+                </div>
+                <p class="text-sm sm:text-lg text-[#fcfcfd] text-center mb-8">Based on your choices, these events could be a great fit for you! </p>
                 <ul id="event-list" class="space-y-4">
                     <!-- Event suggestions will be dynamically inserted here -->
                 </ul>
@@ -179,7 +221,7 @@
                     <p>No perfect matches found. Try again or check the FBLA national website for all event options!</p>
                 </div>
                 <div class="text-center mt-12">
-                    <button id="restart-quiz-btn" class="btn font-bold text-lg px-10 py-4 rounded-full shadow-lg">Start Over</button>
+                    <button id="restart-quiz-btn" class="btn font-bold text-base sm:text-lg px-8 sm:px-10 py-3 sm:py-4 rounded-full shadow-lg">Start Over</button>
                 </div>
             </div>
         </div>
@@ -187,8 +229,7 @@
 
     <script>
         // Data for FBLA events
-        const eventsData = [
-            // Objective Test (Solo)
+        const FBLA_EVENTS = [
             { name: "Accounting I", type: "Objective Test", teamSize: "Solo", cluster: "Finance", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Advanced Accounting", type: "Objective Test", teamSize: "Solo", cluster: "Finance", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Advertising", type: "Objective Test", teamSize: "Solo", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
@@ -220,8 +261,6 @@
             { name: "Real Estate", type: "Objective Test", teamSize: "Solo", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Retail Management", type: "Objective Test", teamSize: "Solo", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Securities & Investments", type: "Objective Test", teamSize: "Solo", cluster: "Finance", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
-
-            // Presentation (Solo)
             { name: "Career Portfolio", type: "Presentation", teamSize: "Solo", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Future Business Educator", type: "Presentation", teamSize: "Solo", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Future Business Leader", type: "Presentation", teamSize: "Solo", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
@@ -229,8 +268,6 @@
             { name: "Job Interview", type: "Presentation", teamSize: "Solo", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Introduction to Public Speaking", type: "Presentation", teamSize: "Solo", cluster: "Communication", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Public Speaking", type: "Presentation", teamSize: "Solo", cluster: "Communication", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
-
-            // Presentation (Team)
             { name: "Broadcast Journalism", type: "Presentation", teamSize: "Team", cluster: "Communication", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Business Ethics", type: "Presentation", teamSize: "Team", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Business Plan", type: "Presentation", teamSize: "Team", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
@@ -245,11 +282,7 @@
             { name: "Sales Presentation", type: "Presentation", teamSize: "Team", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Social Media Strategies", type: "Presentation", teamSize: "Team", cluster: "Communication", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Supply Chain Management", type: "Presentation", teamSize: "Team", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
-
-            // Production (Solo)
             { name: "Computer Applications", type: "Production", teamSize: "Solo", cluster: "Technology", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
-
-            // Production (Team)
             { name: "Coding & Programming", type: "Production", teamSize: "Team", cluster: "Technology", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Computer Game & Simulation Programming", type: "Production", teamSize: "Team", cluster: "Technology", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Digital Animation", type: "Production", teamSize: "Team", cluster: "Technology", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
@@ -260,12 +293,8 @@
             { name: "Visual Design", type: "Production", teamSize: "Team", cluster: "Communication", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Website Coding & Development", type: "Production", teamSize: "Team", cluster: "Technology", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Website Design", type: "Production", teamSize: "Team", cluster: "Technology", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
-
-            // Roleplay (Solo)
             { name: "Customer Service", type: "Roleplay", teamSize: "Solo", cluster: "Communication", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Technology Support & Services", type: "Roleplay", teamSize: "Solo", cluster: "Technology", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
-
-            // Roleplay (Team)
             { name: "Banking & Financial Systems", type: "Roleplay", teamSize: "Team", cluster: "Finance", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Business Management", type: "Roleplay", teamSize: "Team", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Entrepreneurship", type: "Roleplay", teamSize: "Team", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
@@ -277,40 +306,51 @@
             { name: "Parliamentary Procedure", type: "Roleplay", teamSize: "Team", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Sports & Entertainment Management", type: "Roleplay", teamSize: "Team", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
         ];
-
+        
+        // State variables
         let selectedType = null;
         let selectedCluster = null;
         let selectedTeamSize = null;
+        let screenHistory = ['intro'];
 
-        // An array to track the screen history
-        const screenHistory = ['intro'];
+        const screens = {
+            intro: document.getElementById('intro-screen'),
+            q1: document.getElementById('question-1-screen'),
+            q2: document.getElementById('question-2-screen'),
+            q3: document.getElementById('question-3-screen'),
+            loading: document.getElementById('loading-screen'),
+            results: document.getElementById('results-screen')
+        };
 
+        // --- Core Functions ---
         function showScreen(screenId) {
-            const screens = ['intro', 'question-1', 'question-2', 'question-3', 'results'];
-            screens.forEach(id => {
-                document.getElementById(id + '-screen').classList.add('hidden');
+            Object.values(screens).forEach(screen => {
+                screen.classList.add('hidden', 'fade-out-screen');
+                screen.classList.remove('fade-in-screen');
             });
-            document.getElementById(screenId + '-screen').classList.remove('hidden');
+            const targetScreen = screens[screenId];
+            if (targetScreen) {
+                targetScreen.classList.remove('hidden', 'fade-out-screen');
+                targetScreen.classList.add('fade-in-screen');
+            }
         }
-
-        // Gets a unique list of available team sizes for the selected event type
+        
         function getAvailableTeamSizes(type) {
-            const filteredEvents = eventsData.filter(event => event.type === type);
+            const filteredEvents = FBLA_EVENTS.filter(event => event.type === type);
             return [...new Set(filteredEvents.map(event => event.teamSize))];
         }
         
-        // Gets a unique list of available clusters for the selected type and team size
         function getAvailableClusters(type, teamSize) {
-            const filteredEvents = eventsData.filter(event => event.type === type && event.teamSize === teamSize);
+            const filteredEvents = FBLA_EVENTS.filter(event => event.type === type && event.teamSize === teamSize);
             return [...new Set(filteredEvents.map(event => event.cluster))];
         }
         
         function filterEvents() {
-            return eventsData.filter(event => {
-                return (selectedType === null || event.type === selectedType) &&
-                       (selectedCluster === null || event.cluster === selectedCluster) &&
-                       (selectedTeamSize === null || event.teamSize === selectedTeamSize);
-            });
+            return FBLA_EVENTS.filter(event => 
+                (selectedType === null || event.type === selectedType) &&
+                (selectedCluster === null || event.cluster === selectedCluster) &&
+                (selectedTeamSize === null || event.teamSize === selectedTeamSize)
+            );
         }
 
         function displayResults(results) {
@@ -321,19 +361,30 @@
                 document.getElementById('no-results').classList.add('hidden');
                 results.forEach(event => {
                     const li = document.createElement('li');
-                    // Changed li to be a link
                     const link = document.createElement('a');
                     link.href = event.url;
-                    link.target = "_blank"; // Open in a new tab
-                    link.classList.add('block', 'p-6', 'rounded-xl', 'bg-[#001540]', 'shadow-sm', 'text-[#fcfcfd]');
-                    link.innerHTML = `<h4 class="text-xl font-bold text-yellow-gold">${event.name}</h4>`;
+                    link.target = "_blank";
+                    link.classList.add('block', 'p-6', 'rounded-xl', 'bg-[#001540]', 'shadow-custom', 'text-[#fcfcfd]', 'hover:border-yellow-gold', 'border', 'border-transparent');
+                    link.innerHTML = `
+                        <div class="flex items-center">
+                            <h4 class="text-xl font-bold text-yellow-gold flex-grow">${event.name}</h4>
+                            <svg class="w-6 h-6 text-yellow-gold flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </div>
+                    `;
                     li.appendChild(link);
                     eventList.appendChild(li);
                 });
             } else {
                 document.getElementById('no-results').classList.remove('hidden');
             }
-            showScreen('results');
+            
+            showScreen('loading');
+            setTimeout(() => {
+                showScreen('results');
+                screenHistory.push('results');
+            }, 1500);
         }
 
         function createClusterCards(clusters) {
@@ -341,43 +392,41 @@
             container.innerHTML = '';
             
             const clusterDescriptions = {
-                "Business": "Events related to management, entrepreneurship, and law.",
-                "Finance": "Events related to accounting, personal finance, and investments.",
-                "Technology": "Events related to coding, design, and cybersecurity.",
-                "Communication": "Events focused on public speaking and journalism."
+                "Business": "Management, entrepreneurship, and law.",
+                "Finance": "Accounting, personal finance, and investments.",
+                "Technology": "Coding, design, and cybersecurity.",
+                "Communication": "Public speaking and journalism."
             };
 
-            clusters.forEach(cluster => {
+            clusters.forEach((cluster, index) => {
                 const div = document.createElement('div');
-                div.classList.add('card', 'p-8', 'rounded-2xl');
+                div.classList.add('card', 'p-6', 'rounded-2xl', 'border', 'border-[#333]');
                 div.dataset.cluster = cluster;
-                div.innerHTML = `<h3 class="text-2xl font-semibold text-yellow-gold mb-2">${cluster}</h3><p class="text-base text-[#fcfcfd]">${clusterDescriptions[cluster]}</p>`;
+                div.style.animationDelay = `${0.1 * (index + 1)}s`;
+                div.innerHTML = `<h3 class="text-xl sm:text-2xl font-semibold text-yellow-gold mb-2">${cluster}</h3><p class="text-sm sm:text-base text-[#fcfcfd]">${clusterDescriptions[cluster]}</p>`;
+                
+                // Add the event listener directly here
                 div.addEventListener('click', (e) => {
-                    // Add active class to the selected card
                     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
                     e.currentTarget.classList.add('active');
-
                     selectedCluster = e.currentTarget.dataset.cluster;
                     const results = filterEvents();
                     displayResults(results);
-                    screenHistory.push('results');
                 });
                 container.appendChild(div);
             });
         }
         
-        // Event Listeners
+        // --- Event Listeners ---
         document.getElementById('start-quiz-btn').addEventListener('click', () => {
-            showScreen('question-1');
-            screenHistory.push('question-1');
+            showScreen('q1');
+            screenHistory.push('q1');
         });
 
         document.querySelectorAll('#question-1-screen .card').forEach(card => {
             card.addEventListener('click', (e) => {
-                // Add active class to the selected card
                 document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
                 e.currentTarget.classList.add('active');
-                
                 selectedType = e.currentTarget.dataset.type;
                 const availableTeamSizes = getAvailableTeamSizes(selectedType);
 
@@ -385,51 +434,55 @@
                     selectedTeamSize = availableTeamSizes[0];
                     const availableClusters = getAvailableClusters(selectedType, selectedTeamSize);
                     createClusterCards(availableClusters);
-                    setTimeout(() => { // Add a delay for the animation
-                        showScreen('question-3');
-                        screenHistory.push('question-3');
-                    }, 500);
+                    showScreen('q3');
+                    screenHistory.push('q3');
                 } else {
-                    setTimeout(() => { // Add a delay for the animation
-                        showScreen('question-2');
-                        screenHistory.push('question-2');
-                    }, 500);
+                    showScreen('q2');
+                    screenHistory.push('q2');
                 }
             });
         });
 
         document.querySelectorAll('#question-2-screen .card').forEach(card => {
             card.addEventListener('click', (e) => {
-                // Add active class to the selected card
                 document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
                 e.currentTarget.classList.add('active');
-
                 selectedTeamSize = e.currentTarget.dataset.team;
                 const availableClusters = getAvailableClusters(selectedType, selectedTeamSize);
                 createClusterCards(availableClusters);
-                setTimeout(() => { // Add a delay for the animation
-                    showScreen('question-3');
-                    screenHistory.push('question-3');
-                }, 500);
+                showScreen('q3');
+                screenHistory.push('q3');
             });
         });
         
-        document.querySelectorAll('.back-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                if (screenHistory.length > 1) {
-                    screenHistory.pop(); // Remove current screen
-                    const previousScreenId = screenHistory[screenHistory.length - 1]; // Get the previous screen
-                    showScreen(previousScreenId);
-                }
-            });
+        document.getElementById('back-q1').addEventListener('click', () => showScreen('intro'));
+        document.getElementById('back-q2').addEventListener('click', () => {
+            selectedTeamSize = null;
+            showScreen('q1');
+        });
+        document.getElementById('back-q3').addEventListener('click', () => {
+            selectedCluster = null;
+            const availableTeamSizes = getAvailableTeamSizes(selectedType);
+            if (availableTeamSizes.length === 1) {
+                showScreen('q1');
+            } else {
+                showScreen('q2');
+            }
+        });
+        document.getElementById('back-results').addEventListener('click', () => {
+            selectedCluster = null;
+            const availableTeamSizes = getAvailableTeamSizes(selectedType);
+            const availableClusters = getAvailableClusters(selectedType, selectedTeamSize);
+            createClusterCards(availableClusters);
+            showScreen('q3');
         });
 
         document.getElementById('restart-quiz-btn').addEventListener('click', () => {
             selectedType = null;
             selectedCluster = null;
             selectedTeamSize = null;
-            screenHistory.length = 1; // Clear history except for the intro screen
-            document.querySelectorAll('.card').forEach(c => c.classList.remove('active')); // Reset active state
+            screenHistory = ['intro'];
+            document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
             showScreen('intro');
         });
     </script>
