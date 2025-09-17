@@ -192,6 +192,29 @@
                     <!-- Dynamic career cluster cards will be inserted here -->
                 </div>
             </div>
+
+            <!-- Question 4: Grade Level -->
+            <div id="question-4-screen" class="hidden">
+                <div class="flex items-center mb-6 sm:mb-8">
+                    <button id="back-q4" class="back-btn text-gray-400 hover:text-yellow-gold p-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </button>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-[#fcfcfd] flex-grow text-center">Are you in 9th or 10th grade?</h2>
+                    <div class="w-6"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <div id="grade-yes" class="card p-6 sm:p-8 rounded-2xl border border-[#333] text-center" style="animation-delay: 0.1s;">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-yellow-gold mb-2">Yes</h3>
+                        <p class="text-sm sm:text-base text-[#fcfcfd]">Show me events for younger members.</p>
+                    </div>
+                    <div id="grade-no" class="card p-6 sm:p-8 rounded-2xl border border-[#333] text-center" style="animation-delay: 0.2s;">
+                        <h3 class="text-xl sm:text-2xl font-semibold text-yellow-gold mb-2">No</h3>
+                        <p class="text-sm sm:text-base text-[#fcfcfd]">Show me all other events.</p>
+                    </div>
+                </div>
+            </div>
             
             <!-- Loading Screen -->
             <div id="loading-screen" class="loading-screen hidden">
@@ -277,6 +300,7 @@
             { name: "Financial Planning", type: "Presentation", teamSize: "Team", cluster: "Finance", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Financial Statement Analysis", type: "Presentation", teamSize: "Team", cluster: "Finance", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Introduction to Business Presentation", type: "Presentation", teamSize: "Team", cluster: "Marketing", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
+            { name: "Introduction to Social Media Strategies", type: "Presentation", teamSize: "Team", cluster: "Marketing", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Local Chapter Annual Business Report", type: "Presentation", teamSize: "Team", cluster: "Business", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Public Service Announcement", type: "Presentation", teamSize: "Team", cluster: "Marketing", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
             { name: "Sales Presentation", type: "Presentation", teamSize: "Team", cluster: "Marketing", url: "https://connect.fbla.org/headquarters/files/High%20School%20Competitive%20Events%20Resources/25-26-High-School-CE-Event-Descriptions.pdf" },
@@ -318,6 +342,7 @@
             q1: document.getElementById('question-1-screen'),
             q2: document.getElementById('question-2-screen'),
             q3: document.getElementById('question-3-screen'),
+            q4: document.getElementById('question-4-screen'),
             loading: document.getElementById('loading-screen'),
             results: document.getElementById('results-screen')
         };
@@ -410,8 +435,17 @@
                     document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
                     e.currentTarget.classList.add('active');
                     selectedCluster = e.currentTarget.dataset.cluster;
-                    const results = filterEvents();
-                    displayResults(results);
+
+                    const currentFilteredEvents = filterEvents();
+                    const hasIntroEvents = currentFilteredEvents.some(event => event.name.startsWith("Introduction to"));
+
+                    if (hasIntroEvents) {
+                        showScreen('q4');
+                        screenHistory.push('q4');
+                    } else {
+                        const finalResults = currentFilteredEvents.filter(event => !event.name.startsWith("Introduction to")).sort((a, b) => a.name.localeCompare(b.name));
+                        displayResults(finalResults);
+                    }
                 });
                 container.appendChild(div);
             });
@@ -454,6 +488,20 @@
                 screenHistory.push('q3');
             });
         });
+
+        document.getElementById('grade-yes').addEventListener('click', () => {
+            const results = filterEvents();
+            const introEvents = results.filter(event => event.name.startsWith("Introduction to")).sort((a, b) => a.name.localeCompare(b.name));
+            const nonIntroEvents = results.filter(event => !event.name.startsWith("Introduction to")).sort((a, b) => a.name.localeCompare(b.name));
+            const sortedResults = introEvents.concat(nonIntroEvents);
+            displayResults(sortedResults);
+        });
+
+        document.getElementById('grade-no').addEventListener('click', () => {
+            const results = filterEvents();
+            const nonIntroEvents = results.filter(event => !event.name.startsWith("Introduction to")).sort((a, b) => a.name.localeCompare(b.name));
+            displayResults(nonIntroEvents);
+        });
         
         document.getElementById('back-q1').addEventListener('click', () => showScreen('intro'));
         document.getElementById('back-q2').addEventListener('click', () => {
@@ -469,12 +517,18 @@
                 showScreen('q2');
             }
         });
-        document.getElementById('back-results').addEventListener('click', () => {
+        document.getElementById('back-q4').addEventListener('click', () => {
             selectedCluster = null;
-            const availableTeamSizes = getAvailableTeamSizes(selectedType);
             const availableClusters = getAvailableClusters(selectedType, selectedTeamSize);
             createClusterCards(availableClusters);
             showScreen('q3');
+        });
+        document.getElementById('back-results').addEventListener('click', () => {
+            if (screenHistory.length > 1) {
+                screenHistory.pop();
+                const lastScreen = screenHistory[screenHistory.length - 1];
+                showScreen(lastScreen);
+            }
         });
 
         document.getElementById('restart-quiz-btn').addEventListener('click', () => {
